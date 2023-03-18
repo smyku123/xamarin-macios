@@ -49,8 +49,8 @@ resources:
 trigger:
   branches:
     include:
-      - LocalizationCITest1
-      # - Localization
+      # - LocalizationCITest1
+      - Localization
 
 stages:
 
@@ -87,12 +87,11 @@ stages:
 
           git fetch origin
 
-          # gh pr create --title "Bring changes from Localization branch #$(Build.BuildNumber)" --body "This is a detailed description of the new feature" --base main --draft=true
+          gh pr create --title "Bring changes from Localization branch #$(Build.BuildNumber)" --body "The OneLoc team creates these translations to be consumed later on in the second step of the Localization process. We need to bring these into the main branch in order to continue the process." --base main --draft=false
 
         name: BringLocChanges
         displayName: "BringLocChanges"
         workingDirectory: $(System.DefaultWorkingDirectory)
-        # condition: eq(variables['Build.SourceVersionAuthor'], 'tj-devel709')
         condition: startsWith(variables['Build.SourceVersionMessage'], 'LEGO')
         env:
           GITHUB_TOKEN: $(GitHub.Token)
