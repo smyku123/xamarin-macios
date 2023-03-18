@@ -93,6 +93,6 @@ stages:
         displayName: "BringLocChanges"
         workingDirectory: $(System.DefaultWorkingDirectory)
         # condition: eq(variables['Build.SourceVersionAuthor'], 'tj-devel709')
-        condition: startsWith(variables['Build.SourceBranch'], 'lego/')
+        condition: startsWith(variables['Build.SourceVersionMessage'], 'LEGO')
         env:
           GITHUB_TOKEN: $(GitHub.Token)
