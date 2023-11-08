@@ -49,7 +49,7 @@ using (var writer = new StreamWriter (outputPath)) {
 			var tpv = tfm.Substring (tfm.IndexOfAny (new char [] { '-', '_' }) + 1);
 			writer.WriteLine ($"		<Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Windows.Sdk.Aliased.{tfm}\" Condition=\" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '{tfv}')) And ('$(TargetPlatformVersion)' == '' Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{defaultApiVersion}')) Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{tpv}'))) And $([MSBuild]::IsOSPlatform('windows'))\" />");
 		}
-		writer.WriteLine ($"		<Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Windows.Sdk.Aliased.net7\" \" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '7.0')) And $([MSBuild]::IsOSPlatform('windows'))\" />");
+		writer.WriteLine ($"		<Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Windows.Sdk.Aliased.net7\" Condition=\"$([MSBuild]::VersionEquals($(TargetFrameworkVersion), '7.0')) And $([MSBuild]::IsOSPlatform('windows'))\" />");
 	}
 	writer.WriteLine ($"	</ImportGroup>");
 	writer.WriteLine ();
