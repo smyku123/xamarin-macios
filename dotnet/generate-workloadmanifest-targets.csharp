@@ -34,7 +34,12 @@ using (var writer = new StreamWriter (outputPath)) {
 		var tfv = tfm.Replace ("net", "");
 		tfv = tfv.Substring (0, tfv.IndexOfAny (new char [] { '-', '_' }));
 		var tpv = tfm.Substring (tfm.IndexOfAny (new char [] { '-', '_' }) + 1);
-		writer.WriteLine ($"		<Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Sdk.{tfm}\" Condition=\" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '{tfv}')) And ('$(TargetPlatformVersion)' == '' Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{defaultApiVersion}')) Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{tpv}')))\" />");
+		if (defaultApiVersion == tpv) {
+			writer.WriteLine ($"		<Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Sdk.{tfm}\" Condition=\" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '{tfv}')) And ('$(TargetPlatformVersion)' == '' Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{defaultApiVersion}')))\" />");
+		} else {
+			writer.WriteLine ($"		<Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Sdk.{tfm}\" Condition=\" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '{tfv}')) And ('$(TargetPlatformVersion)' == '' Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{defaultApiVersion}')) Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{tpv}')))\" />");
+		}
+		writer.WriteLine ($"        <Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Sdk.net7\" Condition=\" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '7.0')) \" />");
 	}
 	if (hasWindows) {
 		writer.WriteLine ();
@@ -44,17 +49,13 @@ using (var writer = new StreamWriter (outputPath)) {
 			var tpv = tfm.Substring (tfm.IndexOfAny (new char [] { '-', '_' }) + 1);
 			writer.WriteLine ($"		<Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Windows.Sdk.Aliased.{tfm}\" Condition=\" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '{tfv}')) And ('$(TargetPlatformVersion)' == '' Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{defaultApiVersion}')) Or $([MSBuild]::VersionEquals($(TargetPlatformVersion), '{tpv}'))) And $([MSBuild]::IsOSPlatform('windows'))\" />");
 		}
+		writer.WriteLine ($"		<Import Project=\"Sdk.props\" Sdk=\"Microsoft.{platform}.Windows.Sdk.Aliased.net7\" \" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '7.0')) And $([MSBuild]::IsOSPlatform('windows'))\" />");
 	}
 	writer.WriteLine ($"	</ImportGroup>");
 	writer.WriteLine ();
 	writer.WriteLine ($"	<ItemGroup Condition=\" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and $([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), '6.0')) \">");
 	writer.WriteLine ($"		<SdkSupportedTargetPlatformIdentifier Include=\"{platformLowerCase}\" DisplayName=\"{platform}\" />");
 	writer.WriteLine ($"	</ItemGroup>");
-
-	writer.WriteLine ($"	<PropertyGroup Condition=\" '$(TargetPlatformIdentifier)' == '{platform}' and $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '6.0')) \">");
-	writer.WriteLine ($"		<_MultiTargetTargetsFile>$(_XamarinSdkRootDirectory)..\\@NUGET_VERSION_NO_METADATA@\\targets\\Xamarin.Shared.Sdk.MultiTarget.targets</_MultiTargetTargetsFile>");
-	writer.WriteLine ($"		<AfterMicrosoftNETSdkTargets Condition=\"Exists('$(_MultiTargetTargetsFile)')\">$(AfterMicrosoftNETSdkTargets);$(_MultiTargetTargetsFile)</AfterMicrosoftNETSdkTargets>");
-	writer.WriteLine ($"	</PropertyGroup>");
 
 	writer.WriteLine ($"</Project>");
 	writer.WriteLine ();
